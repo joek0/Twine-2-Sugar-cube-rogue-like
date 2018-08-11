@@ -1,0 +1,472 @@
+<tw-storydata name="RPG" startnode="8" creator="Twine" creator-version="2.2.1" ifid="9B2386CF-006C-4B6B-B912-A9C8644FF2E7" zoom="1" format="SugarCube" format-version="2.26.0" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">#map {
+	font-family: monospace; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style><script role="script" id="twine-user-script" type="text/twine-javascript">// Begin Inventory Macros
+// Original macros by F2Andy: http://strugglingwithtwine.blogspot.ca/2014/03/handling-inventory.html
+//
+// Instructions:
+//
+// 1. In a passage, check if there's an item in the inventory...
+// ...if not, give the user the option to link to a passage that adds it to inventory:
+// <<if $inventory.indexOf("An Unsigned Note") == -1>>There is a note here. [[Pick up the note.]]<<endif>>
+//
+// 2. In a passage, check if there's an item in the inventory..
+// ...if so, give the user a choice to progress to a new passage:
+// <<if $inventory.indexOf("The Golden Key") != -1>>[[Unlock the door.]]<<endif>>
+//
+// 3. To add an "Inventory" link in your sidebar menu, create a passage named "StoryMenu".
+// In it, create a link to your inventory's passage: [[Inventory]] or [[Backpack]], for example.
+// Create a passage named "Inventory", and in it, write something like the following:
+// <<if $inventory.length == 0>>You are not carrying anything.<<else>>You are carrying:
+// <<invWithLinks>> <<endif>>
+// <<back>>
+
+// A helper function for the following macros.
+window.getInv = function() {
+  return state.active.variables.inventory;
+}
+
+// Starts your inventory. You need to call this once at the start of your game in order to make the inventory work.
+// Usage: Place <<initInv>> in your StoryInit passage. Don't have a StoryInit passage? Make one.
+macros.initInv = {
+  handler: function(place, macroName, params, parser) {
+    state.active.variables.inventory = [];
+  }
+};
+
+// Add an item to your inventory:
+// Usage: <<addToInv rock>> or <<addToInv "a smooth rock">>
+macros.addToInv = {
+  handler: function(place, macroName, params, parser) {
+    if (params.length == 0) {
+      throwError(place, "<<" + macroName + ">>: no parameters given");
+      return;
+    }
+    if (state.active.variables.inventory.indexOf(params[0]) == -1) {
+      state.active.variables.inventory.push(params[0]);
+    }
+  }
+};
+
+// Removes an item from your inventory
+// Usage: <<removeFromInv rock>> or <<removeFromInv "a smooth rock">>
+macros.removeFromInv = {
+  handler: function(place, macroName, params, parser) {
+    if (params.length == 0) {
+      throwError(place, "<<" + macroName + ">>: no parameters given");
+      return;
+    }
+    var index = state.active.variables.inventory.indexOf(params[0]);
+    if (index != -1) {
+      state.active.variables.inventory.splice(index, 1);
+    }
+  }
+};
+
+// Display the inventory as a list: Rock, Paper, Scissors
+// This can go in any passage, but the best spot would be your [[Inventory]] passage.
+// Usage: <<inv>>
+macros.inv = {
+  handler: function(place, macroName, params, parser) {
+    if (state.active.variables.inventory.length == 0) {
+      new Wikifier(place, 'nothing');
+    } else {
+      new Wikifier(place, state.active.variables.inventory.join(','));
+    }
+  }
+};
+
+// Display the inventory as a series of links to passages with the same names.
+// This can go in any passage, but the best spot would be your [[Inventory]] passage.
+// Usage: <<invWithLinks>>
+// If those passages don't exist, the links will be broken.
+// There is a line break after every item in the inventory.
+macros.invWithLinks = { 
+  handler: function(place, macroName, params, parser) {
+    if (state.active.variables.inventory.length == 0) {
+      new Wikifier(place, 'nothing');
+    } else {
+      new Wikifier(place, '[[' + state.active.variables.inventory.join(']]<br>[[') + ']]');
+    }
+  }
+};
+
+// Empty the inventory entirely.
+// Note: This is not like "dropping" an object; they are not added to the current room/passage. It just erases them all entirely.
+// Usage: <<emptyInv>>
+macros.emptyInv = { 
+  handler: function(place, macroName, params, parser) {
+    state.active.variables.inventory = []
+  }
+};
+// End Inventory Macros
+
+
+
+
+
+
+
+</script><tw-passagedata pid="1" name="StoryInit" tags="" position="0,0" size="100,100">&lt;&lt;set $mapArray to 
+[[0,0,0,0,0,0,0,0,0,0,0],
+[0,1,1,1,0,1,1,1,1,1,0],
+[0,0,0,1,0,0,0,0,0,1,0],
+[0,1,0,1,1,1,1,1,0,1,0],
+[0,1,0,0,0,0,0,1,0,1,0],
+[0,1,1,1,1,1,1,1,0,1,0],
+[0,0,0,0,0,0,0,1,0,1,0],
+[0,1,0,1,1,1,1,1,1,1,0],
+[0,1,0,1,0,0,0,1,0,0,0],
+[0,1,1,1,0,1,1,1,1,2,0],
+[0,0,0,0,0,0,0,0,0,0,0]]&gt;&gt;
+
+&lt;&lt;set $positionRow to 1&gt;&gt;
+&lt;&lt;set $positionCol to 1&gt;&gt;
+
+&lt;&lt;createMap&gt;&gt;
+&lt;&lt;set $mapArray to $mapGrid&gt;&gt;
+&lt;&lt;initInv&gt;&gt;</tw-passagedata><tw-passagedata pid="2" name="Location" tags="" position="125,0" size="100,100">&lt;span id=&quot;map&quot;&gt;
+&lt;&lt;nobr&gt;&gt;
+&lt;&lt;for $i to 0; $i lt $mapArray.length; $i++&gt;&gt;
+	&lt;&lt;for $k to 0; $k lt $mapArray[$i].length; $k++&gt;&gt;
+    	&lt;&lt;if $k eq $positionRow and $i eq $positionCol&gt;&gt;
+        	&lt;&lt;print &quot;&amp;#64;&quot;&gt;&gt; 
+        &lt;&lt;elseif $mapArray[$i][$k] eq 1&gt;&gt;
+        	&lt;&lt;print &quot;&amp;#46;&quot;&gt;&gt; 
+        &lt;&lt;elseif $mapArray[$i][$k] eq 0&gt;&gt;
+        	&lt;&lt;print &quot;&amp;#35;&quot;&gt;&gt; 
+        &lt;&lt;elseif $mapArray[$i][$k] eq 2&gt;&gt;
+        	&lt;&lt;print &quot;&amp;#60;&quot;&gt;&gt; 
+        &lt;&lt;/if&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+    &lt;&lt;print &quot;&lt;br&gt;&quot;&gt;&gt;
+&lt;&lt;/for&gt;&gt;
+&lt;&lt;/nobr&gt;&gt;
+&lt;/span&gt;</tw-passagedata><tw-passagedata pid="3" name="East" tags="" position="500,125" size="100,100">&lt;&lt;set $positionRow += 1&gt;&gt;
+&lt;&lt;include &quot;Map System&quot;&gt;&gt;</tw-passagedata><tw-passagedata pid="4" name="West" tags="" position="375,125" size="100,100">&lt;&lt;set $positionRow -= 1&gt;&gt;
+&lt;&lt;include &quot;Map System&quot;&gt;&gt;</tw-passagedata><tw-passagedata pid="5" name="South" tags="" position="250,124" size="100,100">&lt;&lt;set $positionCol += 1&gt;&gt;
+&lt;&lt;include &quot;Map System&quot;&gt;&gt;</tw-passagedata><tw-passagedata pid="6" name="North" tags="" position="125,125" size="100,100">&lt;&lt;set $positionCol -= 1&gt;&gt;
+&lt;&lt;include &quot;Map System&quot;&gt;&gt;</tw-passagedata><tw-passagedata pid="7" name="Exit" tags="" position="625,125" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="8" name="start" tags="" position="0,250" size="100,100">&lt;&lt;display &quot;Map System&quot;&gt;&gt;</tw-passagedata><tw-passagedata pid="9" name="Map System" tags="" position="0,125" size="100,100">&lt;&lt;include &quot;Location&quot;&gt;&gt;
+&lt;&lt;nobr&gt;&gt;
+&lt;&lt;if $mapArray[$positionCol-1][$positionRow] eq 1&gt;&gt;
+[[North]] | 
+&lt;&lt;elseif $mapArray[$positionCol-1][$positionRow] eq 2&gt;&gt;
+[[Exit]] | 
+&lt;&lt;/if&gt;&gt;
+&lt;&lt;if $mapArray[$positionCol][$positionRow+1] eq 1&gt;&gt;
+[[East]] | 
+&lt;&lt;elseif $mapArray[$positionCol][$positionRow+1] eq 2&gt;&gt;
+[[Exit]] | 
+&lt;&lt;/if&gt;&gt;
+&lt;&lt;if $mapArray[$positionCol+1][$positionRow] eq 1&gt;&gt;
+[[South]] | 
+&lt;&lt;elseif $mapArray[$positionCol+1][$positionRow] eq 2&gt;&gt;
+[[Exit]] | 
+&lt;&lt;/if&gt;&gt;
+&lt;&lt;if $mapArray[$positionCol][$positionRow-1] eq 1&gt;&gt;
+[[West]] | 
+&lt;&lt;elseif $mapArray[$positionCol][$positionRow-1] eq 2&gt;&gt;
+[[Exit]] | 
+&lt;&lt;/if&gt;&gt;
+&lt;&lt;/nobr&gt;&gt;</tw-passagedata><tw-passagedata pid="10" name="createMap" tags="widget" position="257,1" size="100,100">&lt;&lt;widget &quot;createMap&quot;&gt;&gt;
+    //create map array
+    &lt;&lt;set $mapGrid to [
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]&gt;&gt;
+	
+	//create room sizes
+    &lt;&lt;set $room1 to {
+        row1: Math.ceil(Math.random() * 2 + 2),
+        row2: Math.ceil(Math.random() * 2 + 4),
+        col1: Math.ceil(Math.random() * 2 + 2),
+        col2: Math.ceil(Math.random() * 2 + 4)
+    }&gt;&gt;
+
+    &lt;&lt;set $room2 to {
+        row1: Math.ceil(Math.random() * 2 + 10),
+        row2: Math.ceil(Math.random() * 2 + 12),
+        col1: Math.ceil(Math.random() * 2 + 2),
+        col2: Math.ceil(Math.random() * 2 + 4)
+    }&gt;&gt;
+
+    &lt;&lt;set $room3 to {
+        row1: Math.ceil(Math.random() * 2 + 10),
+        row2: Math.ceil(Math.random() * 2 + 12),
+        col1: 9,
+        col2: 11
+    }&gt;&gt;
+
+    &lt;&lt;set $room4 to {
+        row1: Math.ceil(Math.random() * 2 + 2),
+        row2: Math.ceil(Math.random() * 2 + 4),
+        col1: 13,
+        col2: 15
+    }&gt;&gt;
+
+    &lt;&lt;set $room5 to {
+        row1: Math.ceil(Math.random() * 2 + 2),
+        row2: Math.ceil(Math.random() * 2 + 4),
+        col1: Math.ceil(Math.random() * 2 + 18),
+        col2: Math.ceil(Math.random() * 2 + 20)
+    }&gt;&gt;
+
+    &lt;&lt;set $room6 to {
+        row1: Math.ceil(Math.random() * 2 + 2),
+        row2: Math.ceil(Math.random() * 2 + 4),
+        col1: Math.ceil(Math.random() * 2 + 26),
+        col2: Math.ceil(Math.random() * 2 + 28)
+    }&gt;&gt;
+
+    &lt;&lt;set $room7 to {
+        row1: 9,
+        row2: 11,
+        col1: Math.ceil(Math.random() * 2 + 26),
+        col2: Math.ceil(Math.random() * 2 + 28)
+    }&gt;&gt;
+
+    &lt;&lt;set $room8 to {
+        row1: 13,
+        row2: 15,
+        col1: Math.ceil(Math.random() * 2 + 18),
+        col2: Math.ceil(Math.random() * 4 + 20)
+    }&gt;&gt;
+	
+	//fill rooms
+	&lt;&lt;for _i to $room1.col1; _i&lt;= $room1.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room1.row1; _j&lt;= $room1.row2; _j++&gt;&gt;
+            &lt;&lt;if _j is $room1.row1 &amp;&amp; _i is $room1.col1&gt;&gt;
+                &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+                &lt;&lt;set $positionRow to $room1.row1&gt;&gt;
+                &lt;&lt;set $positionCol to $room1.col1&gt;&gt;
+            &lt;&lt;else&gt;&gt;
+                &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+            &lt;&lt;/if&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+	
+	&lt;&lt;for _i to $room2.col1; _i&lt;= $room2.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room2.row1; _j&lt;= $room2.row2; _j++&gt;&gt;
+            &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room3.col1; _i&lt;= $room3.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room3.row1; _j&lt;= $room3.row2; _j++&gt;&gt;
+            &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room4.col1; _i&lt;= $room4.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room4.row1; _j&lt;= $room4.row2; _j++&gt;&gt;
+            &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room5.col1; _i&lt;= $room5.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room5.row1; _j&lt;= $room5.row2; _j++&gt;&gt;
+            &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room6.col1; _i&lt;= $room6.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room6.row1; _j&lt;= $room6.row2; _j++&gt;&gt;
+            &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room7.col1; _i&lt;= $room7.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room7.row1; _j&lt;= $room7.row2; _j++&gt;&gt;
+            &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room8.col1; _i&lt;= $room8.col2; _i++&gt;&gt;
+        &lt;&lt;for _j to $room8.row1; _j&lt;= $room8.row2; _j++&gt;&gt;
+            &lt;&lt;if _j is $room8.row2 &amp;&amp; _i is $room8.col2&gt;&gt;
+                &lt;&lt;set $mapGrid[_j][_i] to 2&gt;&gt;
+                &lt;&lt;set $exitRow to $room8.row2&gt;&gt;
+                &lt;&lt;set $exitCol to $room8.col2&gt;&gt;
+            &lt;&lt;else&gt;&gt;
+                &lt;&lt;set $mapGrid[_j][_i] to 1&gt;&gt;
+            &lt;&lt;/if&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    //create hall locations
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 2)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room1.col1 &amp;&amp; _j &lt;= $room1.col2 &amp;&amp; _j &gt;= $room2.col1 &amp;&amp; _j &lt;= $room2.col2&gt;&gt;
+            &lt;&lt;set $hall1 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 10)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room2.row1 &amp;&amp; _j &lt;= $room2.row2 &amp;&amp; _j &gt;= $room3.row1 &amp;&amp; _j &lt;= $room3.row2&gt;&gt;
+            &lt;&lt;set $hall2 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 10)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room3.row1 &amp;&amp; _j &lt;= $room3.row2&gt;&gt;
+            &lt;&lt;set $hall6 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 3 + 12)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room4.col1 &amp;&amp; _j &lt;= $room4.col2&gt;&gt;
+            &lt;&lt;set $hall7 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 2)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room4.row1 &amp;&amp; _j &lt;= $room4.row2 &amp;&amp; _j &gt;= $room5.row1 &amp;&amp; _j &lt;= $room5.row2&gt;&gt;
+            &lt;&lt;set $hall3 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 2)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room5.row1 &amp;&amp; _j &lt;= $room5.row2 &amp;&amp; _j &gt;= $room6.row1 &amp;&amp; _j &lt;= $room6.row2&gt;&gt;
+            &lt;&lt;set $hall4 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 26)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room6.col1 &amp;&amp; _j &lt;= $room6.col2 &amp;&amp; _j &gt;= $room7.col1 &amp;&amp; _j &lt;= $room7.col2&gt;&gt;
+            &lt;&lt;set $hall5 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 4 + 26)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room7.col1 &amp;&amp; _j &lt;= $room7.col2&gt;&gt;
+            &lt;&lt;set $hall8 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i!=0&gt;&gt;
+        &lt;&lt;set _j to Math.ceil(Math.random() * 3 + 12)&gt;&gt;
+        &lt;&lt;if _j &gt;= $room8.row1 &amp;&amp; _j &lt;= $room8.row2&gt;&gt;
+            &lt;&lt;set $hall9 to _j&gt;&gt;
+            &lt;&lt;break&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+        &lt;&lt;set _i to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    //fill halls
+    &lt;&lt;for _i to $room1.row2; _i&lt;= $room2.row1; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[_i][$hall1] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room2.col2; _i&lt;= $room3.col1; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[$hall2][_i] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room4.col2; _i&lt;= $room5.col1; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[$hall3][_i] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room5.col2; _i&lt;= $room6.col1; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[$hall4][_i] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room6.row2; _i&lt;= $room7.row1; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[_i][$hall5] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room3.col2; _i&lt;= $hall7; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[$hall6][_i] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room4.row2; _i&lt;= $hall6; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[_i][$hall7] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room7.row2; _i&lt;= $hall9; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[_i][$hall8] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+
+    &lt;&lt;for _i to $room8.col2; _i&lt;= $hall8; _i++&gt;&gt;
+        &lt;&lt;set $mapGrid[$hall9][_i] to 1&gt;&gt;
+    &lt;&lt;/for&gt;&gt;
+&lt;&lt;/widget&gt;&gt;</tw-passagedata></tw-storydata>
